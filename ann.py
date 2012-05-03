@@ -2,7 +2,8 @@
 import math
 import copy
 import random as r
-from bigfloat import *
+from misc import *
+#from bigfloat import *
 
 #functions for the neural network including update, backprogation
 #sigmoid, etc.
@@ -10,7 +11,6 @@ from bigfloat import *
 def sigmoid(value):
 	#print "sigmoid: ", value
 	return 1 / (1 + math.exp(- value))
-	#return 1 / (1 + math.expm1(- value))
 
 def dsigmoid(value):
 	return math.exp(- value) / ((math.exp(- value) + 1) * (math.exp(- value) + 1)) 
@@ -113,38 +113,15 @@ def initialize_weights(weights,topology):
 					sign = r.random()
 					if(sign < .5):
 						num *= -1
-					weights[i][j][k][l] = BigFloat(num,context=precision(100))
+					weights[i][j][k][l] = num
+					#weights[i][j][k][l] = BigFloat(num,context=precision(100))
 	
-def gen_xor(size):
-	data = []
-	for i in range(size):
-		new = []
-		num = r.random()
-		if(num < .25):
-			new.append(0)
-			new.append(0)
-			new.append(0)
-		elif(num >= .25 and num < .5):
-			new.append(0)
-			new.append(1)
-			new.append(1)
-		elif(num >= .5 and num < .75):
-			new.append(1)
-			new.append(0)
-			new.append(1)
-		else:
-			new.append(1)
-			new.append(0)
-			new.append(1)
-		data.append(new)
-	return data
-
 topology = [2,2,1]
 delta = []
 values = []
 weights = []
 gradient = []
-timesteps = 10000
+timesteps = 100000
 patterns = 100
 
 
@@ -163,7 +140,7 @@ weights[2][0][1][1] = 1
 
 
 initialize_weights(weights,topology)
-r.seed(5890)
+#r.seed(5890)
 #print weights
 data = gen_xor(patterns)
 #print data
