@@ -1,5 +1,6 @@
 import random as r
 
+
 def gen_xor(size):
 	data = []
 	for i in range(size):

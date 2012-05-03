@@ -122,7 +122,7 @@ values = []
 weights = []
 gradient = []
 timesteps = 100000
-patterns = 100
+patterns = 1000
 
 
 
@@ -146,24 +146,32 @@ data = gen_xor(patterns)
 #print data
 desired = [data[0]]
 p = 0
+numCorrect = 0
 for i in range(timesteps):	
 	values[0][0] = data[p][0]
 	values[0][1] = data[p][1]
 	desired[0] = data[p][2]
-	print "timestep: ",i, "pattern: ",p," input: ",values[0][0], " ",values[0][1]
+	#print "timestep: ",i, "pattern: ",p," input: ",values[0][0], " ",values[0][1]
 	#print "feedforward"
 	update(weights,values)
 	#print "MSE"
 	err = error(values[2],desired)
-	print "A: ",values[0][0],"B: ",values[0][1],"Output: ", sigmoid(values[2][0]), "Error: ",err
+	#print "A: ",values[0][0],"B: ",values[0][1],"Output: ", sigmoid(values[2][0]), "Error: ",err
 	#if(error > .1):
 	#print "backpropagate"
 	if(err > .1):
 		backpropagate(values,desired,weights,gradient)
 		compute_delta(delta,gradient,values,.9,topology)
 		update_weight(delta,weights,1.0,topology)
+	else:
+		numCorrect += 1
 	p += 1
 	if(p >= patterns):
+		print i, " timesteps"
+		print "Correctly classified ",numCorrect, " of ",patterns," patterns"
+		if(numCorrect == patterns):
+			break
+		numCorrect = 0
 		p = 0
 print weights	
 #print "Delta"
