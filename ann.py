@@ -120,22 +120,22 @@ def gen_xor(size):
 	for i in range(size):
 		new = []
 		num = r.random()
-		if(num < 2):
+		if(num < .25):
 			new.append(0)
 			new.append(0)
 			new.append(0)
-		#elif(num >= .25 and num < .5):
-		#	new.append(0)
-		#	new.append(1)
-		#	new.append(1)
-		#elif(num >= .5 and num < .75):
-		#	new.append(1)
-		#	new.append(0)
-		#	new.append(1)
-		#else:
-		#	new.append(1)
-		#	new.append(1)
-		#	new.append(0)
+		elif(num >= .25 and num < .5):
+			new.append(0)
+			new.append(1)
+			new.append(1)
+		elif(num >= .5 and num < .75):
+			new.append(1)
+			new.append(0)
+			new.append(1)
+		else:
+			new.append(1)
+			new.append(0)
+			new.append(1)
 		data.append(new)
 	return data
 
@@ -144,6 +144,8 @@ delta = []
 values = []
 weights = []
 gradient = []
+timesteps = 10000
+patterns = 100
 
 
 
@@ -163,24 +165,30 @@ weights[2][0][1][1] = 1
 initialize_weights(weights,topology)
 r.seed(5890)
 #print weights
-data = gen_xor(1000)
+data = gen_xor(patterns)
 #print data
 desired = [data[0]]
-for i in range(len(data)):	
-	values[0][0] = data[i][0]
-	values[0][1] = data[i][1]
-	desired[0] = data[i][2]
-	print "input: ",values[0][0], " ",values[0][1]
-	print "feedforward"
+p = 0
+for i in range(timesteps):	
+	values[0][0] = data[p][0]
+	values[0][1] = data[p][1]
+	desired[0] = data[p][2]
+	print "timestep: ",i, "pattern: ",p," input: ",values[0][0], " ",values[0][1]
+	#print "feedforward"
 	update(weights,values)
-	print "MSE"
+	#print "MSE"
 	err = error(values[2],desired)
 	print "A: ",values[0][0],"B: ",values[0][1],"Output: ", sigmoid(values[2][0]), "Error: ",err
 	#if(error > .1):
-	print "backpropagate"
-	backpropagate(values,desired,weights,gradient)
-	compute_delta(delta,gradient,values,.9,topology)
-	update_weight(delta,weights,.5,topology)	
+	#print "backpropagate"
+	if(err > .1):
+		backpropagate(values,desired,weights,gradient)
+		compute_delta(delta,gradient,values,.9,topology)
+		update_weight(delta,weights,1.0,topology)
+	p += 1
+	if(p >= patterns):
+		p = 0
+print weights	
 #print "Delta"
 #print delta
 #print "Values"
