@@ -1,6 +1,24 @@
+#!/usr/bin/python2 
 import random as r
+import re
 
-
+def load_data(filename):
+	data = []
+	f = open(filename,"r")
+	row = []
+	for line in f:
+		if(len(line) < 5):
+			row.append(float(line))
+			if(row[3] == 2):
+				row[3] = .5
+			data.append(row)
+			row = []
+		else:
+			items = line.split(",")
+			row.append(float(items[0]))
+			row.append(float(items[1]))
+			row.append(float(items[2]))
+	return data
 def gen_xor(size):
 	data = []
 	for i in range(size):
@@ -24,5 +42,3 @@ def gen_xor(size):
 			new.append(0)
 		data.append(new)
 	return data
-
-

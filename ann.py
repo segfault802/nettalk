@@ -49,7 +49,8 @@ def backpropagate(v,desired,w,gradient):
 	for i in range(len(v[1])):
 		sum  = 0
 		for j in range(len(v[2])):
-			sum += gradient[2][j]*w[1][j][0][i]*dsigmoid(v[1][i])
+			#sum += gradient[2][j]*w[1][j][0][i]*dsigmoid(v[1][i])
+			sum += gradient[2][j]*w[2][j][1][i]*dsigmoid(v[1][i])
 		gradient[1][i] = sum
 		
 
@@ -116,33 +117,23 @@ def initialize_weights(weights,topology):
 					weights[i][j][k][l] = num
 					#weights[i][j][k][l] = BigFloat(num,context=precision(100))
 	
-topology = [2,2,1]
+topology = [3,20,1]
 delta = []
 values = []
 weights = []
 gradient = []
-timesteps = 100000
+timesteps = 1000000
 patterns = 1000
-
-
-
+offset = 0
+eta = 8.0
+a = .9
 
 allocate_lists(topology,values,weights,delta,gradient)
 
-weights[1][0][0][0] = 1
-weights[1][0][0][1] = -1
-weights[1][1][0][0] = -1
-weights[1][1][0][1] = 1
-weights[2][0][0][0] = 0
-weights[2][0][0][1] = 0
-weights[2][0][1][0] = 1
-weights[2][0][1][1] = 1
-
 
 initialize_weights(weights,topology)
-#r.seed(5890)
-#print weights
-data = gen_xor(patterns)
+#data = gen_xor(patterns)
+data  = load_data("training.dat")
 #print data
 desired = [data[0]]
 p = 0
@@ -150,19 +141,20 @@ numCorrect = 0
 for i in range(timesteps):	
 	values[0][0] = data[p][0]
 	values[0][1] = data[p][1]
-	desired[0] = data[p][2]
+	values[0][2] = data[p][2]
+	desired[0] = data[p][3]
 	#print "timestep: ",i, "pattern: ",p," input: ",values[0][0], " ",values[0][1]
 	#print "feedforward"
 	update(weights,values)
 	#print "MSE"
 	err = error(values[2],desired)
 	#print "A: ",values[0][0],"B: ",values[0][1],"Output: ", sigmoid(values[2][0]), "Error: ",err
-	#if(error > .1):
+	#print err,desired[0],sigmoid(values[2][0])
 	#print "backpropagate"
 	if(err > .1):
 		backpropagate(values,desired,weights,gradient)
-		compute_delta(delta,gradient,values,.9,topology)
-		update_weight(delta,weights,1.0,topology)
+		compute_delta(delta,gradient,values,a,topology)
+		update_weight(delta,weights,eta,topology)
 	else:
 		numCorrect += 1
 	p += 1
@@ -172,13 +164,27 @@ for i in range(timesteps):
 		if(numCorrect == patterns):
 			break
 		numCorrect = 0
-		p = 0
-print weights	
-#print "Delta"
-#print delta
-#print "Values"
-#print values
-#print "Weights"
-#print weights
-#print "Gradient"
-#print gradient
+		p = offset
+
+print "Testing"
+patterns = 100
+timesteps = 100
+offset = 0
+data = load_data("testing.dat")
+for i in range(timesteps):	
+	values[0][0] = data[p][0]
+	values[0][1] = data[p][1]
+	values[0][2] = data[p][2]
+	desired[0] = data[p][3]
+	update(weights,values)
+	err = error(values[2],desired)
+	if(err <= .1):
+		numCorrect += 1
+	p += 1
+	if(p >= patterns):
+		print i, " timesteps"
+		print "Correctly classified ",numCorrect, " of ",patterns," patterns"
+		if(numCorrect == patterns):
+			break
+		numCorrect = 0
+		p = offset
