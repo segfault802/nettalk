@@ -23,7 +23,6 @@ def update(w,v):
 	for i in range(1,n): #each layer
 		for j in range(len(v[i])): #node in each layer
 			sum = 0
-			#print "wtf ",len(w[i][j])
 			for k in range(len(w[i][j])):
 				for l in range(len(w[i][j][k])):
 					#print "Update I: ", i,"J: ", j, "K: ", k,"L: ",l
@@ -37,19 +36,16 @@ def error(output,desired):
 	error = 0
 	n = len(output)
 	for i in range(n):
-		#error += ((sigmoid(desired[i]) - sigmoid(output[i])) * (sigmoid(desired[i]) - sigmoid(output[i])))
 		error += ((desired[i] - sigmoid(output[i])) * (desired[i] - sigmoid(output[i])))
 	return error
 
 #parameters are lists
 def backpropagate(v,desired,w,gradient):
 	for i in range(len(v[2])):
-		#gradient[2][i] = (sigmoid(desired[i]) - sigmoid(v[2][i]))*dsigmoid(v[2][i])
 		gradient[2][i] = (desired[i] - sigmoid(v[2][i]))*dsigmoid(v[2][i])
 	for i in range(len(v[1])):
 		sum  = 0
 		for j in range(len(v[2])):
-			#sum += gradient[2][j]*w[1][j][0][i]*dsigmoid(v[1][i])
 			sum += gradient[2][j]*w[2][j][1][i]*dsigmoid(v[1][i])
 		gradient[1][i] = sum
 		
@@ -117,74 +113,4 @@ def initialize_weights(weights,topology):
 					weights[i][j][k][l] = num
 					#weights[i][j][k][l] = BigFloat(num,context=precision(100))
 	
-topology = [3,20,1]
-delta = []
-values = []
-weights = []
-gradient = []
-timesteps = 1000000
-patterns = 1000
-offset = 0
-eta = 8.0
-a = .9
 
-allocate_lists(topology,values,weights,delta,gradient)
-
-
-initialize_weights(weights,topology)
-#data = gen_xor(patterns)
-data  = load_data("training.dat")
-#print data
-desired = [data[0]]
-p = 0
-numCorrect = 0
-for i in range(timesteps):	
-	values[0][0] = data[p][0]
-	values[0][1] = data[p][1]
-	values[0][2] = data[p][2]
-	desired[0] = data[p][3]
-	#print "timestep: ",i, "pattern: ",p," input: ",values[0][0], " ",values[0][1]
-	#print "feedforward"
-	update(weights,values)
-	#print "MSE"
-	err = error(values[2],desired)
-	#print "A: ",values[0][0],"B: ",values[0][1],"Output: ", sigmoid(values[2][0]), "Error: ",err
-	#print err,desired[0],sigmoid(values[2][0])
-	#print "backpropagate"
-	if(err > .1):
-		backpropagate(values,desired,weights,gradient)
-		compute_delta(delta,gradient,values,a,topology)
-		update_weight(delta,weights,eta,topology)
-	else:
-		numCorrect += 1
-	p += 1
-	if(p >= patterns):
-		print i, " timesteps"
-		print "Correctly classified ",numCorrect, " of ",patterns," patterns"
-		if(numCorrect == patterns):
-			break
-		numCorrect = 0
-		p = offset
-
-print "Testing"
-patterns = 100
-timesteps = 100
-offset = 0
-data = load_data("testing.dat")
-for i in range(timesteps):	
-	values[0][0] = data[p][0]
-	values[0][1] = data[p][1]
-	values[0][2] = data[p][2]
-	desired[0] = data[p][3]
-	update(weights,values)
-	err = error(values[2],desired)
-	if(err <= .1):
-		numCorrect += 1
-	p += 1
-	if(p >= patterns):
-		print i, " timesteps"
-		print "Correctly classified ",numCorrect, " of ",patterns," patterns"
-		if(numCorrect == patterns):
-			break
-		numCorrect = 0
-		p = offset
