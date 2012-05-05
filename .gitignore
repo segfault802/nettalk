@@ -1,4 +1,6 @@
 *.pyc
 *.dat
+*.data
 *~
 *.swp
+*.list
