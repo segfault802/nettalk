@@ -22,7 +22,7 @@ for my $word (@data){
 	chomp($word);
 	$word = lc($word);
 	#print $word." \n";
-	$line = "grep \"\\b".$word."\\b[ ]*.*\" nettalk.data >> out.dat";
+	$line = "grep \"\^".$word."\\b[ ]*.*\" nettalk.data >> out.dat";
 	system($line);
 	print $line."\n";
 }

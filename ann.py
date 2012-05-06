@@ -106,7 +106,7 @@ def initialize_weights(weights,topology):
 		for j in range(topology[i]):
 			for k in range(i):
 				for l in range(topology[k]):
-					num = r.random()
+					num = r.random() * .3
 					sign = r.random()
 					if(sign < .5):
 						num *= -1

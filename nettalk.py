@@ -13,8 +13,8 @@ weights = []
 gradient = []
 eta = 1.0
 a = .9
-passes = 100 #number of passes through the set
-words = 1 #number of words to use
+passes = 5000 #number of passes through the set
+words = 500 #number of words to use
 offset = 0 #offset from the beginning of the list
 groupSize = 29 #size of the input group for each character
 margin = 3 #number of characters on either side of the current character
@@ -32,17 +32,18 @@ initialize_weights(weights,topology)
 
 
 #print charIndex
-data = load_nettalk_data('out.dat')
+data = load_nettalk_data('list')
 #print data
 
 for i in range(passes):
 	numCorrect = 0
-	total = 0	
+	total = 0
+	averageError = 0	
 	for word in range(words):
-		print 'word: ', data[word][0]
+		#print 'word: ', data[word][0]
 		strlen = len(data[word][0])		 
 		for pos in range(strlen):
-			print 'position: ',pos			
+			#print 'position: ',pos			
 			start = pos - margin
 			end = pos + margin + 1
 			#window = []
@@ -73,7 +74,8 @@ for i in range(passes):
 			#update and do backpropagation
 			update(weights,values)
 			err = error(values[2],desired)
-			print err			
+			averageError += err
+			#print err			
 			if(err > .1):
 				backpropagate(values,desired,weights,gradient)
 				compute_delta(delta,gradient,values,a,topology)
@@ -81,7 +83,8 @@ for i in range(passes):
 			else:
 				numCorrect += 1
 			total += 1
-	print "Correctly classified ",numCorrect, " of ",total," phonemes"
+	averageError = averageError / total	
+	print "Correctly classified ",numCorrect, " of ",total," phonemes after ",i," passes, average error: ",averageError
 	numCorrect = 0
 			
 
